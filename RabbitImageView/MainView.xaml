@@ -1,0 +1,208 @@
+﻿<Window Style="{DynamicResource WindowStyle}" 
+        x:Class="RabbitImageView.MainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RabbitImageView"
+        mc:Ignorable="d"
+        Title="" Width="1200" Height="800" MinWidth="700" MinHeight="500" Background="#FFD3D3D3" SizeChanged="Window_SizeChanged" Loaded="Window_Load" KeyDown="Window_KeyDown">
+        <!--Title="" Height="1000" MinHeight="300" Width="1800" MinWidth="400" AllowsTransparency="True" WindowStyle="none" Background="Transparent">-->
+       
+
+    <!-- 拖拽边框改变窗口大小 -->
+    <WindowChrome.WindowChrome>
+        <!--<WindowChrome CaptionHeight="20" ResizeBorderThickness="5"/>-->
+        <WindowChrome/>
+    </WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <ContextMenu x:Key="MainLMenu" Opened="MainLMenu_Open" Closed="MainLMenu_Close">
+            <MenuItem Header="打开新图片" Click="Menu_Open_Image_File"/>
+            <MenuItem Header="打开图片所在文件夹" Click="Menu_Open_File_Dir"/>
+            <Separator />
+            <MenuItem Header="关于兔子" Click="Menu_About_Rabbit"/>
+        </ContextMenu>
+        
+        <Style x:Key="BtnCommon" TargetType="{x:Type Button}">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <Style x:Key="TitleTextArea" TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <Style x:Key="BtnImgThumbnail" TargetType="{x:Type Button}">
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="40"/>
+        </Style>
+
+        <Style x:Key="BtnTools" TargetType="{x:Type Button}">
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Width" Value="45"/>
+            <Setter Property="Height" Value="45"/>
+        </Style>
+
+        <Style x:Key="Title_Panel" TargetType="{x:Type DockPanel}">
+            <Setter Property="Background" Value="#696969"/>
+        </Style>
+        
+        <Style x:Key="WindowStyle" TargetType="{x:Type Window}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Window}">
+                        <ContentPresenter/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#FFD3D3D3"/>
+        <ControlTemplate x:Key="ButtonBase" TargetType="{x:Type ButtonBase}">
+            <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="true">
+                <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter Property="Background" TargetName="border" Value="{StaticResource Button.MouseOver.Background}"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <ControlTemplate x:Key="ButtonRightLeft" TargetType="{x:Type ButtonBase}">
+            <Border x:Name="border" CornerRadius="30,30,30,30" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="true">
+                <ContentPresenter x:Name="contentPresenter" Cursor="Hand" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter Property="Background" TargetName="border" Value="#FFD3D3D3"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <ControlTemplate x:Key="ButtonToolsTemplate" TargetType="{x:Type ButtonBase}">
+            <Border x:Name="border" CornerRadius="5,5,5,5" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="true">
+                <ContentPresenter x:Name="contentPresenter" Cursor="Hand" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter Property="Background" TargetName="border" Value="#FF808080"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+    </Window.Resources>
+    
+    <!--布局容器-->
+    <Grid x:Name="Base_Grid" Background="Transparent" ContextMenu="{StaticResource MainLMenu}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="27"/>
+            <RowDefinition/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        
+        <!-- 标题栏 -->
+        <DockPanel x:Name="Title_Panel" LastChildFill="True" Grid.Row="0" MouseLeftButtonDown="Windows_DragMove" Style="{DynamicResource Title_Panel}">
+            <Image Stretch="Uniform" Source="pack://application:,,,/data/icon/logo.png"/>
+            <TextBlock Text="RabbitView " DockPanel.Dock="Left" Style="{DynamicResource TitleTextArea}" Background="Transparent" Block.TextAlignment="Center" VerticalAlignment="Center"/>
+            <Button Width="50" Template="{DynamicResource ButtonBase}" Style="{DynamicResource BtnCommon}"  Grid.Row="0" DockPanel.Dock="Right" Click="Windows_Exit" WindowChrome.IsHitTestVisibleInChrome="True">
+                <Image Stretch="Uniform" Source="pack://application:,,,/data/icon/close.png"/>
+            </Button>
+            <Button Width="50" Template="{DynamicResource ButtonBase}" Style="{DynamicResource BtnCommon}" Grid.Row="0" DockPanel.Dock="Right" Click="Windows_Maximized" WindowChrome.IsHitTestVisibleInChrome="True">
+                <Image Stretch="Uniform" Source="pack://application:,,,/data/icon/maximized.png"/>
+            </Button>
+            <Button Width="50" Template="{DynamicResource ButtonBase}" Style="{DynamicResource BtnCommon}" Grid.Row="0" DockPanel.Dock="Right" Click="Windows_Minimized" WindowChrome.IsHitTestVisibleInChrome="True">
+                <Image Stretch="Uniform" Source="pack://application:,,,/data/icon/minimized.png"/>
+            </Button>
+            <TextBlock Text="{Binding TitleText}" Style="{DynamicResource TitleTextArea}" DockPanel.Dock="Left" Block.TextAlignment="Center" VerticalAlignment="Center"/>
+        </DockPanel>
+
+        <!-- 中部主体 -->
+        <Grid x:Name="ImageViewPanel" Grid.Row="1" Background="#FFD3D3D3" AllowDrop="True" Drop="Element_DragDrop" DragEnter="Element_DragEnter"
+              MouseLeftButtonDown="Mouse_Left_Down" MouseLeftButtonUp="Mouse_Left_Up" MouseMove="Mouse_Move" MouseWheel="Mouse_Wheel" ClipToBounds="True">
+            <Canvas Grid.Row="1" x:Name="Img_View_Canvas">
+                <Image x:Name="Img_View" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" RenderOptions.ClearTypeHint="Enabled" RenderTransformOrigin="0.5,0.5"
+                        Source = "{Binding ViewImagePath}" Width="{Binding WidthView}" Height="{Binding HeightView}">
+                    <Image.RenderTransform>
+                        <RotateTransform Angle="{Binding Angel}"/>
+                    </Image.RenderTransform>
+                </Image>
+                <MediaElement x:Name="ME_View" MediaEnded="ME_View_MediaEnded" Stretch="UniformToFill" RenderTransformOrigin="0.5,0.5"
+                                Source = "{Binding ViewMediaElementPath}" Width="{Binding WidthView}" Height="{Binding HeightView}">
+                    <MediaElement.RenderTransform>
+                        <RotateTransform Angle="{Binding Angel}"/>
+                    </MediaElement.RenderTransform>
+                </MediaElement>
+            </Canvas>
+        </Grid>
+
+        <!--<DockPanel x:Name="ImageViewPanel" LastChildFill="false" Grid.Row="1" Background="Transparent" IsHitTestVisible="false">
+            <Button IsHitTestVisible="True" Template="{DynamicResource ButtonRightLeft}" Style="{DynamicResource BtnCommon}" Width="60" Height="60" DockPanel.Dock="Left" Click="Btn_left_Click" >
+                <Image Stretch="Uniform" Source="pack://application:,,,/data/icon/left.png"/>
+            </Button>
+            <Button Template="{DynamicResource ButtonRightLeft}" Style="{DynamicResource BtnCommon}" Width="60" Height="60" DockPanel.Dock="Right" Click="Btn_right_Click">
+                <Image Stretch="Uniform" Source="pack://application:,,,/data/icon/right.png"/>
+            </Button>
+        </DockPanel>-->
+        
+        <!-- 底部工具栏 -->
+        <StackPanel x:Name="BottomTools" Grid.Row="2" Background="#696969">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Cursor="">
+                <Button Template="{DynamicResource ButtonToolsTemplate}" Style="{DynamicResource BtnTools}" Click="Btn_Zoom_1_1">
+                    <Image Stretch="Uniform" Source="pack://application:,,,/data/icon/zoom_1_1_w.png"/>
+                </Button>
+                <Button Template="{DynamicResource ButtonToolsTemplate}" Style="{DynamicResource BtnTools}" Click="Btn_Zoom_Normal">
+                    <Image Stretch="Uniform" Source="pack://application:,,,/data/icon/zoom_normal_w.png"/>
+                </Button>
+
+                <Button Template="{DynamicResource ButtonRightLeft}" Style="{DynamicResource BtnCommon}" Margin="30,0,5,0" Background="White" Width="45" Height="45" DockPanel.Dock="Left" Click="Btn_left_Click"> 
+                    <Image Stretch="Uniform" Source="pack://application:,,,/data/icon/left.png"/>
+                </Button>
+
+                <Button Template="{DynamicResource ButtonBase}" Style="{DynamicResource BtnImgThumbnail}" Click="ImgThumbnail_Click">
+                    <Image x:Name="Img_Thumbnail_1" Stretch="Uniform"/>
+                </Button>
+                <Button Template="{DynamicResource ButtonBase}" Style="{DynamicResource BtnImgThumbnail}" Click="ImgThumbnail_Click">
+                    <Image x:Name="Img_Thumbnail_2" Stretch="Uniform"/>
+                </Button>
+                <Button Template="{DynamicResource ButtonBase}" Style="{DynamicResource BtnImgThumbnail}" Click="ImgThumbnail_Click">
+                    <Image x:Name="Img_Thumbnail_3" Stretch="Uniform"/>
+                </Button>
+                <Button Template="{DynamicResource ButtonBase}" Style="{DynamicResource BtnImgThumbnail}" Width="45" Height="45" Click="ImgThumbnail_Click">
+                    <Image x:Name="Img_Thumbnail_4" Stretch="Uniform"/>
+                </Button>
+                <Button Template="{DynamicResource ButtonBase}" Style="{DynamicResource BtnImgThumbnail}" Click="ImgThumbnail_Click">
+                    <Image x:Name="Img_Thumbnail_5" Stretch="Uniform"/>
+                </Button>
+                <Button Template="{DynamicResource ButtonBase}" Style="{DynamicResource BtnImgThumbnail}" Click="ImgThumbnail_Click">
+                    <Image x:Name="Img_Thumbnail_6" Stretch="Uniform"/>
+                </Button>
+                <Button Template="{DynamicResource ButtonBase}" Style="{DynamicResource BtnImgThumbnail}" Click="ImgThumbnail_Click">
+                    <Image x:Name="Img_Thumbnail_7" Stretch="Uniform"/>
+                </Button>
+                
+                <Button Template="{DynamicResource ButtonRightLeft}" Style="{DynamicResource BtnCommon}" Margin="5,0,30,0" Width="45" Height="45" Background="White" DockPanel.Dock="Right" Click="Btn_right_Click">
+                    <Image Stretch="Uniform" Source="pack://application:,,,/data/icon/right.png"/>
+                </Button>
+
+                <Button Template="{DynamicResource ButtonToolsTemplate}" Style="{DynamicResource BtnTools}" Click="Btn_Rotation_Left">
+                    <Image Stretch="Uniform" Source="pack://application:,,,/data/icon/rotation_left.png"/>
+                </Button>
+                <Button Template="{DynamicResource ButtonToolsTemplate}" Style="{DynamicResource BtnTools}" Click="Btn_Rotation_Right">
+                    <Image Stretch="Uniform" Source="pack://application:,,,/data/icon/rotation_right.png"/>
+                </Button>
+            </StackPanel>
+        </StackPanel>
+        
+    </Grid>
+</Window>
